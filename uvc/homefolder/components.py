@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 
+from .interfaces import IHomefolder, IHomefolders
 from dolmen.container.components import BTreeContainer
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
-from zope.security.interfaces import IUnauthenticatedPrincipal
+from zope.authentication.interfaces import IUnauthenticatedPrincipal
 from zope.traversing.browser.interfaces import IAbsoluteURL
-from zope.component import getUtility
-from .interfaces import IHomefolder, IHomefolders
+from zope.component import getUtility, adapter
+from zope.interface import implementer, provider
+from zope.publisher.interfaces.browser import IBrowserRequest
 
 
 @implementer(IHomefolder)
-class HomeFolder(BTreeContainer):
+class Homefolder(BTreeContainer):
     pass
     
 
 @implementer(IHomefolders)
 class Homefolders(BTreeContainer):
-    default = HomeFolder
+    default = Homefolder
     roles = [u'uvc.User', u'uvc.Editor', u'uvc.MasterUser']
     
-    def make_homefolder(self, factory=None)
+    def make_homefolder(self, factory=None):
         klass= factory or self.default
         return klass()
 
@@ -37,14 +39,14 @@ class Homefolders(BTreeContainer):
 
     def get_homefolder(self, uid):
         return self.get(uid)
-        
+
 
 @adapter(IBrowserRequest)
 @provider(IAbsoluteURL)
 def homefolder_url(request):
-    principal = self.request.principal
+    principal = request.principal
     if IUnauthenticatedPrincipal.providedBy(principal):
         return
-    homefolders = getUtility(IHomeFolders)
+    homefolders = getUtility(IHomefolders)
     homefolder = homefolders.get(principal.id)
     return homefolder and IAbsoluteURL(homefolder, request) or None
