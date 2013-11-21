@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .interfaces import IHomefolder, IHomefolders
+from grokcore.component.interfaces import IContext
 from dolmen.container.components import BTreeContainer
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
 from zope.authentication.interfaces import IUnauthenticatedPrincipal
@@ -9,14 +10,15 @@ from zope.component import getUtility, adapter
 from zope.interface import implementer, provider
 from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.annotation.interfaces import IAttributeAnnotatable
+from zope.container.interfaces import IItemContainer
 
 
-@implementer(IHomefolder, IAttributeAnnotatable)
+@implementer(IItemContainer, IHomefolder, IAttributeAnnotatable, IContext)
 class Homefolder(BTreeContainer):
     pass
 
 
-@implementer(IHomefolders)
+@implementer(IItemContainer, IHomefolders, IContext)
 class Homefolders(BTreeContainer):
     default = Homefolder
     roles = [u'uvc.User', u'uvc.Editor', u'uvc.MasterUser']
