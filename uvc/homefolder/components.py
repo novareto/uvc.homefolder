@@ -15,7 +15,7 @@ class Homefolder(BTreeContainer):
     pass
 
 
-@implementer(IContainer, IHomefolders, IContext)
+@implementer(IContainer, IHomefolders)
 class Homefolders(BTreeContainer):
     default = Homefolder
     roles = [u'uvc.User', u'uvc.Editor', u'uvc.MasterUser']
