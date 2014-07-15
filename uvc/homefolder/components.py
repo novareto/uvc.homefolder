@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
 
 from .interfaces import IHomefolder, IHomefolders
-from grokcore.component.interfaces import IContext
+from cromlech.browser import IRequest, IURL
+from cromlech.container.interfaces import IContainer
+from cromlech.security.interfaces import IUnauthenticatedPrincipal
 from dolmen.container.components import BTreeContainer
-from zope.securitypolicy.interfaces import IPrincipalRoleManager
-from zope.authentication.interfaces import IUnauthenticatedPrincipal
-from zope.traversing.browser.interfaces import IAbsoluteURL
 from zope.component import getUtility, adapter
 from zope.interface import implementer, provider
-from zope.publisher.interfaces.browser import IBrowserRequest
-from zope.annotation.interfaces import IAttributeAnnotatable
-from zope.container.interfaces import IItemContainer
+from zope.securitypolicy.interfaces import IPrincipalRoleManager
 
 
-@implementer(IItemContainer, IHomefolder, IAttributeAnnotatable, IContext)
+@implementer(IContainer, IHomefolder)
 class Homefolder(BTreeContainer):
     pass
 
 
-@implementer(IItemContainer, IHomefolders, IContext)
+@implementer(IContainer, IHomefolders, IContext)
 class Homefolders(BTreeContainer):
     default = Homefolder
     roles = [u'uvc.User', u'uvc.Editor', u'uvc.MasterUser']
@@ -44,12 +41,13 @@ class Homefolders(BTreeContainer):
         return self.get(uid)
 
 
-@adapter(IBrowserRequest)
-@provider(IAbsoluteURL)
+# this adapter makes no sense
+@adapter(IRequest)
+@provider(IURL)
 def homefolder_url(request):
     principal = request.principal
     if IUnauthenticatedPrincipal.providedBy(principal):
         return
     homefolders = getUtility(IHomefolders)
     homefolder = homefolders.get(principal.id)
-    return homefolder and IAbsoluteURL(homefolder, request) or None
+    return homefolder and IURL(homefolder, request) or None
