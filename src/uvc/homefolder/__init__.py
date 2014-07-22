@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from .components import Homefolder, Homefolders, homefolder_url
+from .components import Homefolder, Homefolders
 from .interfaces import IHomefolder, IHomefolders

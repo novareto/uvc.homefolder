@@ -39,15 +39,3 @@ class Homefolders(BTreeContainer):
 
     def get_homefolder(self, uid):
         return self.get(uid)
-
-
-# this adapter makes no sense
-@adapter(IRequest)
-@provider(IURL)
-def homefolder_url(request):
-    principal = request.principal
-    if IUnauthenticatedPrincipal.providedBy(principal):
-        return
-    homefolders = getUtility(IHomefolders)
-    homefolder = homefolders.get(principal.id)
-    return homefolder and IURL(homefolder, request) or None
