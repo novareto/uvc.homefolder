@@ -8,9 +8,10 @@ from dolmen.container.components import BTreeContainer
 from zope.component import getUtility, adapter
 from zope.interface import implementer, provider
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
+from zope.annotation.interfaces import IAnnotations, IAnnotatable
 
 
-@implementer(IContainer, IHomefolder)
+@implementer(IContainer, IHomefolder, IAnnotatable, IAnnotations)
 class Homefolder(BTreeContainer):
     pass
 
