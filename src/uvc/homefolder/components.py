@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import uvclight
+
 from .interfaces import IHomefolder, IHomefolders
 from cromlech.browser import IRequest, IURL
 from cromlech.container.interfaces import IContainer
 from cromlech.security.interfaces import IUnauthenticatedPrincipal
 from dolmen.container.components import BTreeContainer
+from dolmen.location import get_absolute_url
+from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.component import getUtility, adapter
 from zope.interface import implementer, provider
+from zope.security.interfaces import IPrincipal
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
-from zope.annotation.interfaces import IAttributeAnnotatable
 
 
 @implementer(IContainer, IHomefolder, IAttributeAnnotatable)
@@ -40,3 +44,18 @@ class Homefolders(BTreeContainer):
 
     def get_homefolder(self, uid):
         return self.get(uid)
+
+
+class HomefolderURL(uvclight.MultiAdapter):
+    uvclight.adapts(IPrincipal, IRequest)
+    uvclight.implements(IURL)
+    uvclight.name('homefolder')
+    
+    def __init__(self, principal, request):
+        self.principal = principal
+        self.request = request
+
+    def __str__(self):
+        homefolders = getUtility(IHomefolders)
+        homefolder = homefolders.get(self.principal.id)
+        return str(get_absolute_url(homefolder, self.request))
