@@ -13,18 +13,23 @@ from zope.component import getUtility, adapter
 from zope.interface import implementer, provider
 from zope.security.interfaces import IPrincipal
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
+from zope.location import ILocation
 
 
-@implementer(IContainer, IHomefolder, IAttributeAnnotatable)
+@implementer(IContainer, IHomefolder, ILocation, IAttributeAnnotatable)
 class Homefolder(BTreeContainer):
-    pass
+    __parent__ = None
+    __name__ = None
 
 
-@implementer(IContainer, IHomefolders)
+@implementer(IContainer, IHomefolders, ILocation)
 class Homefolders(BTreeContainer):
     default = Homefolder
     roles = [u'uvc.User', u'uvc.Editor', u'uvc.MasterUser']
 
+    __parent__ = None
+    __name__ = None
+    
     def make_homefolder(self, factory=None):
         klass = factory or self.default
         return klass()
